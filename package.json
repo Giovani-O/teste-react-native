@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.11",
+    "@faker-js/faker": "^10.4.0",
     "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.1.0",
     "jest-expo": "^55.0.15",
