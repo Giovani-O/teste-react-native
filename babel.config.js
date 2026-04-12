@@ -6,14 +6,11 @@ const babelPresetExpo = require.resolve('babel-preset-expo', {
   paths: [expoDir],
 })
 
-module.exports = function (api) {
+module.exports = (api) => {
   api.cache(true)
 
   return {
-    presets: [
-      [babelPresetExpo, { jsxImportSource: 'nativewind' }],
-      'nativewind/babel',
-    ],
+    presets: [[babelPresetExpo, { jsxImportSource: 'nativewind' }]],
 
     plugins: [
       [

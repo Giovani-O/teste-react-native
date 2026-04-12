@@ -1,8 +1,8 @@
-import { Modal, ModalBackdrop, ModalContent } from '@/components/ui/modal'
+import { View } from 'react-native'
 import { Button, ButtonText } from '@/components/ui/button'
+import { Modal, ModalBackdrop, ModalContent } from '@/components/ui/modal'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
-import { View } from 'react-native'
 
 interface ConfirmDialogProps {
   isOpen: boolean
@@ -27,7 +27,12 @@ export function ConfirmDialog({
           <Text className="text-base font-semibold text-gray-900 flex-1">
             {title}
           </Text>
-          <Pressable onPress={onClose} className="p-1 ml-2">
+          <Pressable
+            onPress={onClose}
+            className="p-1 ml-2"
+            accessibilityRole="button"
+            accessibilityLabel="Fechar"
+          >
             <Text className="text-base text-gray-500">✕</Text>
           </Pressable>
         </View>

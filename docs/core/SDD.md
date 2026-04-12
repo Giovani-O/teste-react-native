@@ -11,16 +11,18 @@
 
 | Technology | Version | Role |
 |---|---|---|
-| Expo SDK | 55.0.14 | App runtime and toolchain |
-| React | 19.2.3 | UI framework (bundled by Expo 55) |
-| React Native | 0.85.0 | Mobile rendering (bundled by Expo 55) |
-| TypeScript | >=4.8 | Static typing |
-| expo-router | 55.0.12 | File-based navigation |
-| Gluestack UI | v2 (CLI) | UI component library |
-| Gluestack UI | v2 (native styling) | Prop-based styling system |
+| Expo SDK | 54.0.33 | App runtime and toolchain |
+| React | 19.1.0 | UI framework (bundled by Expo 54) |
+| React Native | 0.81.5 | Mobile rendering (bundled by Expo 54) |
+| TypeScript | 5.9.2 | Static typing |
+| expo-router | 6.0.23 | File-based navigation |
+| Gluestack UI | v3 (CLI 3.0.11) | UI component scaffolding |
+| Gluestack UI Core | 3.0.16 | UI component library |
+| NativeWind | 4.2.3 | Tailwind CSS styling for React Native |
+| Tailwind CSS | 3.4.19 | Utility-first CSS framework (via NativeWind) |
 | Zustand | 5.0.12 | Client state management |
 | MSW | 2.13.2 | Mocked API server (native mode) |
-| AsyncStorage | 3.0.2 | Local persistence |
+| AsyncStorage | 2.2.0 | Local persistence |
 | jest-expo | 55.0.15 | Test runner |
 | Biome | 2.4.11 | Linter and formatter |
 
@@ -279,7 +281,7 @@ There is no standalone create/edit route. All create and edit operations open a 
 
 ### 8.1 Bottom Sheet
 
-A shared `BottomSheet` component (wrapping a Gluestack UI v2 Actionsheet) is used for:
+A shared `BottomSheet` component (wrapping a Gluestack UI v3 Modal) is used for:
 
 - **Filter sheet** — triggered by a "Filtrar" button in the screen header; contains filter controls for the list below
 - **Create form sheet** — triggered by the FAB (+); contains the form to create a new school or class
@@ -289,7 +291,7 @@ The same form component is rendered inside the sheet for both create and edit �
 
 ### 8.2 Alert Dialog
 
-A shared `ConfirmDialog` component (wrapping a Gluestack UI v2 AlertDialog) is used exclusively for delete confirmation. It displays:
+A shared `ConfirmDialog` component (wrapping a Gluestack UI v3 Modal) is used exclusively for delete confirmation. It displays:
 
 - A warning message: *"Esta ação não pode ser desfeita."*
 - **Cancelar** and **Excluir** buttons
@@ -334,11 +336,12 @@ An in-memory data store inside the MSW handlers simulates persistence within a s
 
 ## 10. UI Layer
 
-Gluestack UI v2 components are added via the `gluestack-ui` CLI on demand. Gluestack's native prop-based styling provides the styling mechanism.
+Gluestack UI v3 components are added via the `gluestack-ui` CLI on demand to `components/ui/`. NativeWind (Tailwind CSS for React Native) provides the styling mechanism.
 
-- No global stylesheet — all styling via Gluestack's prop-based API (<Box p={4} bg="white" />)
-- Gluestack components used for: buttons, inputs, cards, Actionsheet (bottom sheet), AlertDialog, FAB, Box, Text
-- Screens import from `src/components/` for shared elements (`BottomSheet`, `ConfirmDialog`, empty states, loading indicators)
+- Global stylesheet at `global.css` with Tailwind directives — all styling via `className` props using Tailwind utility classes
+- Gluestack components used for: Button, Pressable, Modal (bottom sheet and alert dialog), Box, Text
+- Screens import from `src/components/` for shared elements (`BottomSheet`, `ConfirmDialog`, `FAB`, empty states, loading indicators)
+- `GluestackUIProvider` wraps the app in `app/_layout.tsx`
 
 > **Language convention:** UI strings are in Brazilian Portuguese (pt-BR). All code identifiers — types, interfaces, variables, functions, file names — are in English.
 

@@ -93,7 +93,7 @@ export function SchoolDetailScreen() {
         </ScrollView>
       )}
 
-      <FAB onPress={() => setCreateOpen(true)} />
+      <FAB label="Adicionar turma" onPress={() => setCreateOpen(true)} />
 
       <BottomSheet isOpen={createOpen} onClose={() => setCreateOpen(false)}>
         <View className="p-4">

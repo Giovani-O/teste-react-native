@@ -4,7 +4,7 @@
 
 **Goal:** Install and configure Gluestack UI v3 (with NativeWind) and migrate all existing plain-RN UI components to use Gluestack primitives.
 
-**Architecture:** NativeWind provides Tailwind CSS class-based styling for React Native via Metro + Babel transforms. Gluestack v3 scaffolds its component source code into `src/components/ui/` via the CLI — these are local, copy-pasteable files. The `GluestackUIProvider` wraps the root layout. Each existing component (`BottomSheet`, `ConfirmDialog`, `FAB`, `SchoolListScreen`, `SchoolDetailScreen`) is rewritten to use Gluestack primitives with `className` props instead of `StyleSheet`.
+**Architecture:** NativeWind provides Tailwind CSS class-based styling for React Native via Metro + Babel transforms. Gluestack v3 scaffolds its component source code into `components/ui/` via the CLI — these are local, copy-pasteable files. The `GluestackUIProvider` wraps the root layout. Each existing component (`BottomSheet`, `ConfirmDialog`, `FAB`, `SchoolListScreen`, `SchoolDetailScreen`) is rewritten to use Gluestack primitives with `className` props instead of `StyleSheet`.
 
 **Tech Stack:** Gluestack UI v3, NativeWind 4.x, Tailwind CSS 3.x, Expo ~54, React Native 0.81.5 (New Arch enabled), Expo Router ~6.
 
@@ -15,7 +15,7 @@
 - `app.json` has `"newArchEnabled": true` — New Architecture is ON. NativeWind 4.x supports New Arch.
 - No `babel.config.js` or `metro.config.js` exists yet — they must be created.
 - The Gluestack CLI (`npx gluestack-ui init`) requires an active network connection and may prompt interactively. Use `--yes` flag if available, or follow its prompts to select "Expo" template.
-- Gluestack v3 scaffolds component files into `src/components/ui/` (or a chosen path). The CLI generates: `GluestackUIProvider`, `Box`, `Text`, `Pressable`, `Button`, `Modal`, `ScrollView`, etc. as local source files.
+- Gluestack v3 scaffolds component files into `components/ui/` (or a chosen path). The CLI generates: `GluestackUIProvider`, `Box`, `Text`, `Pressable`, `Button`, `Modal`, `ScrollView`, etc. as local source files.
 - After setup, `global.css` must be imported in the root layout (`app/_layout.tsx`).
 - The existing `src/components/BottomSheet.tsx`, `ConfirmDialog.tsx`, `FAB.tsx` will be fully replaced.
 - The existing screens (`SchoolListScreen.tsx`, `SchoolDetailScreen.tsx`) will have all `StyleSheet` removed and replaced with `className` props.
@@ -30,9 +30,9 @@
 - `metro.config.js` — NativeWind metro wrapper
 - `global.css` — Tailwind directives + CSS variables for Gluestack theme
 - `tailwind.config.js` — NativeWind preset + content paths
-- `src/components/ui/gluestack-ui-provider/index.tsx` — GluestackUIProvider
-- `src/components/ui/gluestack-ui-provider/config.ts` — theme tokens
-- `src/components/ui/` — scaffolded component files (button, box, text, pressable, modal, etc.)
+- `components/ui/gluestack-ui-provider/index.tsx` — GluestackUIProvider
+- `components/ui/gluestack-ui-provider/config.ts` — theme tokens
+- `components/ui/` — scaffolded component files (button, box, text, pressable, modal, etc.)
 - `nativewind-env.d.ts` — TypeScript types for className prop
 
 **Modified:**
@@ -72,7 +72,7 @@ Expected: both packages listed without `UNMET PEER DEPENDENCY` or `npm ERR!` lin
 ## Task 2: Run Gluestack UI v3 init
 
 **Files:**
-- Creates: `babel.config.js`, `metro.config.js`, `global.css`, `tailwind.config.js`, `nativewind-env.d.ts`, `src/components/ui/gluestack-ui-provider/`, and various component files under `src/components/ui/`
+- Creates: `babel.config.js`, `metro.config.js`, `global.css`, `tailwind.config.js`, `nativewind-env.d.ts`, `components/ui/gluestack-ui-provider/`, and various component files under `components/ui/`
 
 - [ ] **Step 1: Run the Gluestack init CLI**
 
@@ -82,7 +82,7 @@ npx gluestack-ui@latest init
 
 When prompted:
 - Project type: **Expo**
-- Components directory: `src/components/ui` (or accept the default, which is usually `components/ui` — adjust in Task 3 if needed)
+- Components directory: `components/ui` (default)
 - Accept all other defaults
 
 The CLI will install additional packages (`@gluestack-ui/core`, `@gluestack-ui/utils`, `react-native-svg`, etc.) and generate config files automatically.
@@ -91,7 +91,7 @@ The CLI will install additional packages (`@gluestack-ui/core`, `@gluestack-ui/u
 
 ```bash
 ls babel.config.js metro.config.js global.css tailwind.config.js nativewind-env.d.ts
-ls src/components/ui/gluestack-ui-provider/
+ls components/ui/gluestack-ui-provider/
 ```
 
 Expected: all five config files present, and `gluestack-ui-provider/` directory with `index.tsx` and `config.ts` inside.
@@ -135,7 +135,7 @@ module.exports = {
   content: [
     './app/**/*.{js,jsx,ts,tsx}',
     './src/**/*.{js,jsx,ts,tsx}',
-    './src/components/ui/**/*.{js,jsx,ts,tsx}',
+    './components/ui/**/*.{js,jsx,ts,tsx}',
   ],
   presets: [require('nativewind/preset')],
   theme: {
@@ -199,7 +199,7 @@ Replace the entire file with:
 
 ```tsx
 import '@/global.css'
-import { GluestackUIProvider } from '@/src/components/ui/gluestack-ui-provider'
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
@@ -222,7 +222,7 @@ export default function RootLayout() {
 }
 ```
 
-> Note: The `@/` alias resolves to the project root because `tsconfig.json` has `"baseUrl": "."` or a `paths` alias. If `@/` is not configured, use relative paths: `import '../global.css'` and `import '../src/components/ui/gluestack-ui-provider'`.
+> Note: The `@/` alias resolves to the project root because `tsconfig.json` has `"baseUrl": "."` or a `paths` alias. If `@/` is not configured, use relative paths: `import '../global.css'` and `import '../components/ui/gluestack-ui-provider'`.
 
 - [ ] **Step 3: Check tsconfig.json for path aliases**
 
@@ -230,7 +230,7 @@ Open `tsconfig.json` and check if `@/` is configured. If paths aliases are not p
 
 ```tsx
 import '../global.css'
-import { GluestackUIProvider } from '../src/components/ui/gluestack-ui-provider'
+import { GluestackUIProvider } from '../components/ui/gluestack-ui-provider'
 ```
 
 ---
@@ -238,7 +238,7 @@ import { GluestackUIProvider } from '../src/components/ui/gluestack-ui-provider'
 ## Task 4: Scaffold required Gluestack UI components
 
 **Files:**
-- Creates: component files under `src/components/ui/` for each added component
+- Creates: component files under `components/ui/` for each added component
 
 - [ ] **Step 1: Add the Box component**
 
@@ -281,7 +281,7 @@ If this command fails with "component not found", skip it — use the RN `Scroll
 - [ ] **Step 7: Verify all added components exist**
 
 ```bash
-ls src/components/ui/
+ls components/ui/
 ```
 
 Expected output includes: `box/`, `text/`, `pressable/`, `button/`, `modal/`, `gluestack-ui-provider/`.
@@ -300,8 +300,8 @@ The FAB is the simplest component — a good starting point to verify the Gluest
 Replace the entire file with:
 
 ```tsx
-import { Pressable } from '@/src/components/ui/pressable'
-import { Text } from '@/src/components/ui/text'
+import { Pressable } from '@/components/ui/pressable'
+import { Text } from '@/components/ui/text'
 
 interface FABProps {
   onPress: () => void
@@ -346,8 +346,8 @@ Stop the server (`Ctrl+C`) after verification.
 Replace the entire file with:
 
 ```tsx
-import { Modal, ModalBackdrop, ModalContent } from '@/src/components/ui/modal'
-import { Pressable } from '@/src/components/ui/pressable'
+import { Modal, ModalBackdrop, ModalContent } from '@/components/ui/modal'
+import { Pressable } from '@/components/ui/pressable'
 import { ReactNode } from 'react'
 import { View } from 'react-native'
 
@@ -375,7 +375,7 @@ export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
 
 > Note: Gluestack's `Modal` component uses `ModalBackdrop` for the overlay (it handles fade animation internally) and `ModalContent` for the sheet. The `animationType` defaults to slide for `ModalContent`.
 
-> If Gluestack's Modal scaffold exports different names (check `src/components/ui/modal/index.tsx` after running `npx gluestack-ui add modal`), adjust imports to match actual exports.
+> If Gluestack's Modal scaffold exports different names (check `components/ui/modal/index.tsx` after running `npx gluestack-ui add modal`), adjust imports to match actual exports.
 
 - [ ] **Step 2: Verify in the running app**
 
@@ -408,10 +408,10 @@ import {
   Modal,
   ModalBackdrop,
   ModalContent,
-} from '@/src/components/ui/modal'
-import { Button, ButtonText } from '@/src/components/ui/button'
-import { Pressable } from '@/src/components/ui/pressable'
-import { Text } from '@/src/components/ui/text'
+} from '@/components/ui/modal'
+import { Button, ButtonText } from '@/components/ui/button'
+import { Pressable } from '@/components/ui/pressable'
+import { Text } from '@/components/ui/text'
 import { View } from 'react-native'
 
 interface ConfirmDialogProps {
@@ -475,8 +475,8 @@ export function ConfirmDialog({
 Replace the entire file with:
 
 ```tsx
-import { Pressable } from '@/src/components/ui/pressable'
-import { Text } from '@/src/components/ui/text'
+import { Pressable } from '@/components/ui/pressable'
+import { Text } from '@/components/ui/text'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
@@ -551,7 +551,7 @@ export function SchoolListScreen() {
 Replace the entire file with:
 
 ```tsx
-import { Text } from '@/src/components/ui/text'
+import { Text } from '@/components/ui/text'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ScrollView, View } from 'react-native'
@@ -693,7 +693,7 @@ Expected: no errors (or only pre-existing errors unrelated to this migration).
 
 ## Troubleshooting
 
-**"Module not found: @/src/components/ui/..."**
+**"Module not found: @/components/ui/..."**
 → The `@/` alias may not be set up in `tsconfig.json`. Add to `tsconfig.json`:
 ```json
 {
@@ -716,7 +716,7 @@ Or switch all imports to relative paths (`../../components/ui/...`).
 → NativeWind was not installed. Run `npm install nativewind@^4.1.23` again.
 
 **Gluestack Modal component exports different names**
-→ Open `src/components/ui/modal/index.tsx` and check what is exported. Adjust imports in `BottomSheet.tsx` and `ConfirmDialog.tsx` to match.
+→ Open `components/ui/modal/index.tsx` and check what is exported. Adjust imports in `BottomSheet.tsx` and `ConfirmDialog.tsx` to match.
 
 **`npx gluestack-ui add box` — "command not found" or CLI errors**
 → The Gluestack CLI requires the project to be initialized first (`npx gluestack-ui init`). Re-run init if add commands fail.

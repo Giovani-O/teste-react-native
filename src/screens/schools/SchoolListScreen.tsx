@@ -51,7 +51,7 @@ export function SchoolListScreen() {
         </ScrollView>
       )}
 
-      <FAB onPress={() => setCreateOpen(true)} />
+      <FAB label="Adicionar escola" onPress={() => setCreateOpen(true)} />
 
       <BottomSheet isOpen={createOpen} onClose={() => setCreateOpen(false)}>
         <View className="p-4">
