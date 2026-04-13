@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-A mobile application for school administrators to register and manage schools and their classes. The app operates with a mocked backend (MSW) and persists data locally via AsyncStorage. It is distributed via Expo Go using a QR code — no app store deployment required.
+A mobile application for school administrators to register and manage schools and their classes. The app operates with a mocked backend (MirageJS) and persists data locally via AsyncStorage. It is distributed via Expo Go using a QR code — no app store deployment required.
 
 ---
 
@@ -90,7 +90,7 @@ A school has many turmas (1:N). A turma belongs to exactly one school. Turmas ar
 | ID | Requirement |
 |---|---|
 | NF-01 | App must run on Expo Go via QR code with no build step required |
-| NF-02 | All API calls must be intercepted by MSW — no real network requests |
+| NF-02 | All API calls must be intercepted by MirageJS — no real network requests |
 | NF-03 | State must persist across app restarts via AsyncStorage |
 | NF-04 | Codebase must pass Biome lint checks with no errors |
 | NF-05 | TypeScript strict mode must be enabled |

@@ -13,12 +13,13 @@ interface TurmaStore {
   createTurma: (data: CreateTurmaDTO) => Promise<void>
   updateTurma: (id: string, data: UpdateTurmaDTO) => Promise<void>
   deleteTurma: (id: string) => Promise<void>
+  deleteTurmaBySchoolId: (schoolId: string) => Promise<void>
   clearError: () => void
 }
 
 export const useTurmasStore = create<TurmaStore>()(
   persist(
-    (set) => {
+    (set, get) => {
       const repository = RepositoryFactory.createTurmaRepository()
 
       return {
@@ -74,6 +75,30 @@ export const useTurmasStore = create<TurmaStore>()(
                 isLoading: false,
               }))
             }
+          } catch (error) {
+            set({ error: (error as Error).message, isLoading: false })
+          }
+        },
+
+        deleteTurmaBySchoolId: async (schoolId: string) => {
+          set({ isLoading: true, error: null })
+          try {
+            const currentTurmas = get().turmas
+            const turmasToDelete = currentTurmas.filter(
+              (t: Turma) => t.schoolId === schoolId,
+            )
+            const deleteResults = await Promise.all(
+              turmasToDelete.map((turma) => repository.delete(turma.id)),
+            )
+            if (deleteResults.some((success) => !success)) {
+              throw new Error('Failed to delete all turmas for the school')
+            }
+            set((state) => ({
+              turmas: state.turmas.filter(
+                (t: Turma) => t.schoolId !== schoolId,
+              ),
+              isLoading: false,
+            }))
           } catch (error) {
             set({ error: (error as Error).message, isLoading: false })
           }
