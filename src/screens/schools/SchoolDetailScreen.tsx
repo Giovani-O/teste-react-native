@@ -1,13 +1,20 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
-import { EllipsisVertical, PencilLine, Trash } from 'lucide-react-native'
+import {
+  EllipsisVertical,
+  PencilLine,
+  Plus,
+  Search,
+  Trash,
+} from 'lucide-react-native'
 import { Text } from '@/components/ui/text'
-import { BottomSheet } from '../../components/BottomSheet'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { FAB } from '../../components/FAB'
 import { SchoolFormBottomSheet } from '../../components/SchoolFormBottomSheet'
-import { Shift } from '../../domain/entities/Turma'
+import { TurmaFilterBottomSheet } from '../../components/TurmaFilterBottomSheet'
+import { TurmaFormBottomSheet } from '../../components/TurmaFormBottomSheet'
+import { Shift, Turma } from '../../domain/entities/Turma'
 import { useSchoolsStore } from '../../store/schools.store'
 import { useTurmasStore } from '../../store/turmas.store'
 
@@ -36,14 +43,56 @@ export function SchoolDetailScreen() {
   const {
     updateSchool,
     deleteSchool,
+    incrementClassCount,
+    decrementClassCount,
     isLoading: schoolLoading,
   } = useSchoolsStore()
-  const { turmas, isLoading, fetchTurmasBySchool, deleteTurmaBySchoolId } =
-    useTurmasStore()
+  const {
+    turmas,
+    isLoading,
+    fetchTurmasBySchool,
+    deleteTurmaBySchoolId,
+    createTurma,
+    updateTurma,
+    deleteTurma,
+  } = useTurmasStore()
 
   const school = useSchoolsStore((state) =>
     state.schools.find((s) => s.id === id),
   )
+
+  const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null)
+  const [editingTurma, setEditingTurma] = useState<Turma | null>(null)
+  const [editTurmaOpen, setEditTurmaOpen] = useState(false)
+  const [deleteTurmaOpen, setDeleteTurmaOpen] = useState(false)
+  const [turmaFilterOpen, setTurmaFilterOpen] = useState(false)
+  const [turmaFilters, setTurmaFilters] = useState<{
+    name: string
+    shift: Shift | ''
+    academicYear: string
+  }>({ name: '', shift: '', academicYear: '' })
+
+  const filteredTurmas = useMemo(() => {
+    return turmas.filter((turma) => {
+      const matchesName =
+        !turmaFilters.name ||
+        turma.name.toLowerCase().includes(turmaFilters.name.toLowerCase())
+      const matchesShift =
+        !turmaFilters.shift || turma.shift === turmaFilters.shift
+      const matchesYear =
+        !turmaFilters.academicYear ||
+        turma.academicYear.toString().includes(turmaFilters.academicYear)
+      return matchesName && matchesShift && matchesYear
+    })
+  }, [turmas, turmaFilters])
+
+  const activeTurmaFilterCount = useMemo(() => {
+    let count = 0
+    if (turmaFilters.name) count++
+    if (turmaFilters.shift) count++
+    if (turmaFilters.academicYear) count++
+    return count
+  }, [turmaFilters])
 
   useEffect(() => {
     if (id) {
@@ -74,12 +123,56 @@ export function SchoolDetailScreen() {
     }
   }
 
+  const handleCreateTurma = async (data: {
+    name: string
+    shift: Shift
+    academicYear: number
+  }) => {
+    if (!id) return
+    const previousTurmasCount = useTurmasStore.getState().turmas.length
+    await createTurma({ ...data, schoolId: id })
+    const { error: createTurmaError, turmas: updatedTurmas } =
+      useTurmasStore.getState()
+    if (!createTurmaError && updatedTurmas.length > previousTurmasCount) {
+      incrementClassCount(id, 1)
+      setCreateOpen(false)
+    }
+  }
+
   if (!school) {
     return (
       <View className="flex-1 justify-center items-center">
         <Text className="text-base text-gray-500">Escola não encontrada</Text>
       </View>
     )
+  }
+
+  const handleEditTurma = async (data: {
+    name: string
+    shift: Shift
+    academicYear: number
+  }) => {
+    if (!editingTurma?.id) return
+    await updateTurma(editingTurma.id, data)
+    setEditTurmaOpen(false)
+    setEditingTurma(null)
+  }
+
+  const handleDeleteTurma = async () => {
+    if (!selectedTurma?.id || !id) return
+    const turmaId = selectedTurma.id
+    const turmaExistedBeforeDelete = useTurmasStore
+      .getState()
+      .turmas.some((turma) => turma.id === turmaId)
+    await deleteTurma(turmaId)
+    const turmaStillExists = useTurmasStore
+      .getState()
+      .turmas.some((turma) => turma.id === turmaId)
+    if (turmaExistedBeforeDelete && !turmaStillExists) {
+      decrementClassCount(id, 1)
+      setDeleteTurmaOpen(false)
+      setSelectedTurma(null)
+    }
   }
 
   return (
@@ -147,18 +240,22 @@ export function SchoolDetailScreen() {
         <View className="flex-1 justify-center items-center">
           <ActivityIndicator />
         </View>
-      ) : turmas.length === 0 ? (
+      ) : filteredTurmas.length === 0 ? (
         <View className="flex-1 justify-center items-center p-8">
           <Text className="text-base text-gray-500 text-center mb-2">
-            Nenhuma turma encontrada
+            {turmas.length === 0
+              ? 'Nenhuma turma encontrada'
+              : 'Nenhuma turma atende ao filtro'}
           </Text>
           <Text className="text-sm text-gray-400 text-center">
-            Toque no botão + para adicionar uma turma
+            {turmas.length === 0
+              ? 'Toque no botão + para adicionar uma turma'
+              : 'Tente ajustar os filtros'}
           </Text>
         </View>
       ) : (
         <ScrollView className="flex-1" bounces={false}>
-          {turmas.map((turma) => (
+          {filteredTurmas.map((turma) => (
             <View
               key={turma.id}
               className="flex-row items-center justify-between px-4 py-3.5 border-b border-gray-200 bg-white"
@@ -171,28 +268,89 @@ export function SchoolDetailScreen() {
                   {turma.academicYear}
                 </Text>
               </View>
-              <View
-                className={`px-2.5 py-1 rounded-xl ml-3 ${shiftClassNames[turma.shift]}`}
-              >
-                <Text className="text-xs font-medium text-white">
-                  {shiftLabels[turma.shift]}
-                </Text>
+              <View className="flex-row items-center">
+                <View
+                  className={`px-2.5 py-1 rounded-xl ${shiftClassNames[turma.shift]}`}
+                >
+                  <Text className="text-xs font-medium text-white">
+                    {shiftLabels[turma.shift]}
+                  </Text>
+                </View>
+                <View className="relative ml-2">
+                  <Pressable
+                    className="p-2 -m-1"
+                    onPress={() => setSelectedTurma(turma)}
+                    accessibilityLabel="Mais opções"
+                    accessibilityRole="button"
+                  >
+                    <EllipsisVertical size={20} color="#6B7280" />
+                  </Pressable>
+                  {selectedTurma?.id === turma.id && (
+                    <View className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                      <Pressable
+                        className="flex-row items-center px-4 py-3 border-b border-gray-100"
+                        onPress={() => {
+                          setEditingTurma(turma)
+                          setEditTurmaOpen(true)
+                          setSelectedTurma(null)
+                        }}
+                      >
+                        <PencilLine size={18} color="#374151" />
+                        <Text className="text-gray-700 ml-2.5 text-[14px]">
+                          Editar turma
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        className="flex-row items-center px-4 py-3"
+                        onPress={() => {
+                          setDeleteTurmaOpen(true)
+                        }}
+                      >
+                        <Trash size={18} color="#DC2626" />
+                        <Text className="text-red-600 ml-2.5 text-[14px]">
+                          Excluir turma
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
           ))}
         </ScrollView>
       )}
 
-      <FAB label="Adicionar turma" onPress={() => setCreateOpen(true)} />
+      <FAB
+        label="Filtrar turmas"
+        onPress={() => setTurmaFilterOpen(true)}
+        icon={<Search size={32} color="white" />}
+        badge={activeTurmaFilterCount}
+        backgroundColor="#6B7280"
+        position="left"
+      />
 
-      <BottomSheet isOpen={createOpen} onClose={() => setCreateOpen(false)}>
-        <View className="p-4">
-          <Text className="text-lg font-semibold text-gray-900 mb-2">
-            Nova Turma
-          </Text>
-          <Text className="text-sm text-gray-500">Em construção...</Text>
-        </View>
-      </BottomSheet>
+      <FAB
+        label="Adicionar turma"
+        onPress={() => setCreateOpen(true)}
+        icon={<Plus size={32} color="white" />}
+      />
+
+      <TurmaFormBottomSheet
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onSave={handleCreateTurma}
+      />
+
+      <TurmaFormBottomSheet
+        isOpen={editTurmaOpen}
+        onClose={() => {
+          setEditTurmaOpen(false)
+          setEditingTurma(null)
+        }}
+        onSave={handleEditTurma}
+        initialValues={editingTurma ?? undefined}
+        isLoading={isLoading}
+      />
 
       <SchoolFormBottomSheet
         isOpen={editOpen}
@@ -209,6 +367,25 @@ export function SchoolDetailScreen() {
         title="Excluir Escola"
         message={`Tem certeza que deseja excluir "${school.name}"? Esta ação não pode ser desfeita e todas as turmas associadas serão excluídas.`}
         isLoading={isDeleting || schoolLoading}
+      />
+
+      <ConfirmDialog
+        isOpen={deleteTurmaOpen}
+        onClose={() => {
+          setDeleteTurmaOpen(false)
+          setSelectedTurma(null)
+        }}
+        onConfirm={handleDeleteTurma}
+        title="Excluir Turma"
+        message={`Tem certeza que deseja excluir "${selectedTurma?.name}"? Esta ação não pode ser desfeita.`}
+        isLoading={isLoading}
+      />
+
+      <TurmaFilterBottomSheet
+        isOpen={turmaFilterOpen}
+        onClose={() => setTurmaFilterOpen(false)}
+        filters={turmaFilters}
+        onFiltersChange={setTurmaFilters}
       />
     </View>
   )
