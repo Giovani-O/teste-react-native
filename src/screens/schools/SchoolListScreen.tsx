@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { ScrollView, View } from 'react-native'
 import { Pressable } from '@/components/ui/pressable'
 import { Text } from '@/components/ui/text'
-import { Search } from 'lucide-react-native'
+import { Plus, Search } from 'lucide-react-native'
 import { FAB } from '../../components/FAB'
 import { FilterBottomSheet } from '../../components/FilterBottomSheet'
 import { SchoolFormBottomSheet } from '../../components/SchoolFormBottomSheet'
@@ -110,6 +110,7 @@ export function SchoolListScreen() {
       <FAB
         label="Adicionar escola"
         onPress={() => setCreateOpen(true)}
+        icon={<Plus size={32} color="white" />}
         position="right"
       />
 

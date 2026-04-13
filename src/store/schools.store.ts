@@ -18,6 +18,7 @@ interface SchoolStore {
   updateSchool: (id: string, data: UpdateSchoolDTO) => Promise<void>
   deleteSchool: (id: string) => Promise<void>
   decrementClassCount: (schoolId: string, by: number) => void
+  incrementClassCount: (schoolId: string, by: number) => void
   clearError: () => void
 }
 
@@ -90,6 +91,14 @@ export const useSchoolsStore = create<SchoolStore>()(
               s.id === schoolId
                 ? { ...s, classCount: Math.max(0, s.classCount - by) }
                 : s,
+            ),
+          }))
+        },
+
+        incrementClassCount: (schoolId: string, by: number) => {
+          set((state) => ({
+            schools: state.schools.map((s) =>
+              s.id === schoolId ? { ...s, classCount: s.classCount + by } : s,
             ),
           }))
         },
