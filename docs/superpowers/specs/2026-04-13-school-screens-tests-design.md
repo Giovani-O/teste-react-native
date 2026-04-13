@@ -7,7 +7,7 @@
 
 ## Overview
 
-Add unit tests for `SchoolListScreen` and `SchoolDetailScreen` components using jest-expo and React Native Testing Library.
+Add unit tests for `SchoolListScreen` and `SchoolDetailScreen` components using vitest and React Native Testing Library.
 
 ---
 
@@ -85,7 +85,7 @@ src/screens/schools/
 
 ## Dependencies
 
-- `jest-expo` (already installed)
+- `vitest` (installed)
 - `@testing-library/react-native` (already installed)
 
 ---
@@ -93,5 +93,5 @@ src/screens/schools/
 ## Acceptance Criteria
 
 - [ ] All 8 tests pass
-- [ ] Tests run via `npx jest`
+- [ ] Tests run via `npm test`
 - [ ] No existing tests broken

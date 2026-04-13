@@ -23,7 +23,7 @@
 | Zustand | 5.0.12 | Client state management |
 | MirageJS | 0.1.48 | Mocked API server (XHR interception) |
 | AsyncStorage | 2.2.0 | Local persistence |
-| jest-expo | ~54.0.17 | Test runner |
+| vitest | ^3.1.4 | Test runner |
 | Biome | 2.4.11 | Linter and formatter |
 
 ### 1.1 Dependency Troubleshooting
@@ -355,7 +355,7 @@ Tests are scoped to **screens and components only** (v1 scope).
 
 | Tool | Role |
 |---|---|
-| jest-expo | Test runner, preset handles RN/Expo transforms |
+| vitest | Test runner, simple configuration |
 | React Native Testing Library | Render and interact with components |
 | MirageJS | Same server reused as test fixtures |
 | AsyncStorage mock | `@react-native-async-storage/async-storage/jest/async-storage-mock` |

@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add 8 unit tests for SchoolListScreen and SchoolDetailScreen using jest-expo and React Native Testing Library.
+**Goal:** Add 8 unit tests for SchoolListScreen and SchoolDetailScreen using vitest and React Native Testing Library.
 
 **Architecture:** Tests mock Zustand stores with initial state, render components with Testing Library, and simulate user interactions. Components rely on store state and local UI state—tests will mock both.
 
-**Tech Stack:** jest-expo, @testing-library/react-native
+**Tech Stack:** vitest, @testing-library/react-native
 
 ---
 
@@ -40,8 +40,8 @@ const mockSchool = {
   classCount: 2,
 }
 
-const mockNavigate = jest.fn()
-jest.mock('expo-router', () => ({
+const mockNavigate = vi.fn()
+vi.mock('expo-router', () => ({
   useRouter: () => ({ push: mockNavigate }),
   useLocalSearchParams: () => ({}),
 }))
@@ -98,7 +98,7 @@ describe('SchoolListScreen', () => {
 
 - [ ] **Step 5: Run SchoolListScreen tests**
 
-Run: `npx jest src/screens/schools/__tests__/SchoolListScreen.test.tsx -v`
+Run: `npx vitest run src/screens/schools/__tests__/SchoolListScreen.test.tsx -v`
 Expected: All 3 tests pass
 
 ---
@@ -132,8 +132,8 @@ const mockTurma = {
   schoolId: '1',
 }
 
-jest.mock('expo-router', () => ({
-  useRouter: () => ({ back: jest.fn(), push: jest.fn() }),
+vi.mock('expo-router', () => ({
+  useRouter: () => ({ back: vi.fn(), push: vi.fn() }),
   useLocalSearchParams: () => ({ id: '1' }),
 }))
 
@@ -214,7 +214,7 @@ describe('SchoolDetailScreen', () => {
 
 - [ ] **Step 7: Run SchoolDetailScreen tests**
 
-Run: `npx jest src/screens/schools/__tests__/SchoolDetailScreen.test.tsx -v`
+Run: `npx vitest run src/screens/schools/__tests__/SchoolDetailScreen.test.tsx -v`
 Expected: All 5 tests pass
 
 ---
@@ -223,7 +223,7 @@ Expected: All 5 tests pass
 
 - [ ] **Step 1: Run all tests**
 
-Run: `npx jest --testPathPattern=src/screens/schools/__tests__ -v`
+Run: `npx vitest run --testPathPattern=src/screens/schools/__tests__ -v`
 Expected: All 8 tests pass
 
 - [ ] **Step 2: Verify no lint errors**
