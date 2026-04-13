@@ -13,12 +13,13 @@ interface TurmaStore {
   createTurma: (data: CreateTurmaDTO) => Promise<void>
   updateTurma: (id: string, data: UpdateTurmaDTO) => Promise<void>
   deleteTurma: (id: string) => Promise<void>
+  deleteTurmaBySchoolId: (schoolId: string) => Promise<void>
   clearError: () => void
 }
 
 export const useTurmasStore = create<TurmaStore>()(
   persist(
-    (set) => {
+    (set, get) => {
       const repository = RepositoryFactory.createTurmaRepository()
 
       return {
@@ -77,6 +78,19 @@ export const useTurmasStore = create<TurmaStore>()(
           } catch (error) {
             set({ error: (error as Error).message, isLoading: false })
           }
+        },
+
+        deleteTurmaBySchoolId: async (schoolId: string) => {
+          const currentTurmas = get().turmas
+          const turmasToDelete = currentTurmas.filter(
+            (t: Turma) => t.schoolId === schoolId,
+          )
+          for (const turma of turmasToDelete) {
+            await repository.delete(turma.id)
+          }
+          set((state) => ({
+            turmas: state.turmas.filter((t: Turma) => t.schoolId !== schoolId),
+          }))
         },
 
         clearError: () => set({ error: null }),

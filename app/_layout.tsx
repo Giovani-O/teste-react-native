@@ -8,13 +8,10 @@ async function enableMocking() {
   if (!__DEV__) {
     return
   }
-  console.log('[Mock] starting Mirage server...')
   const { startMirageServer } = await import('../src/data/mocks/mirageServer')
   startMirageServer()
-  console.log('[Mock] installing fetch→XHR shim...')
   const { installFetchXhrShim } = await import('../src/data/mocks/fetchXhrShim')
   installFetchXhrShim()
-  console.log('[Mock] ready')
 }
 
 export default function RootLayout() {

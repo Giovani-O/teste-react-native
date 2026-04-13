@@ -1,5 +1,5 @@
 // src/data/mocks/mirageServer.ts
-import { createServer, Model, Response as MirageResponse } from 'miragejs'
+import { createServer, Response as MirageResponse, Model } from 'miragejs'
 import { dataStore } from './dataStore'
 
 function generateId(): string {
@@ -29,7 +29,6 @@ export function startMirageServer() {
 
       // GET /api/schools
       this.get('/schools', (schema) => {
-        console.log('[Mirage] GET /api/schools')
         const schools = schema.db.schools.where({})
         return schools.map((s: any) => ({
           ...s,
@@ -39,7 +38,6 @@ export function startMirageServer() {
 
       // POST /api/schools
       this.post('/schools', (schema, request) => {
-        console.log('[Mirage] POST /api/schools')
         const body = JSON.parse(request.requestBody)
         const newSchool = {
           id: generateId(),
@@ -57,7 +55,6 @@ export function startMirageServer() {
 
       // GET /api/schools/:id
       this.get('/schools/:id', (schema, request) => {
-        console.log('[Mirage] GET /api/schools/:id', request.params.id)
         const school = schema.db.schools.findBy({ id: request.params.id })
         if (!school) {
           return new MirageResponse(
@@ -74,7 +71,6 @@ export function startMirageServer() {
 
       // PUT /api/schools/:id
       this.put('/schools/:id', (schema, request) => {
-        console.log('[Mirage] PUT /api/schools/:id', request.params.id)
         const school = schema.db.schools.findBy({ id: request.params.id })
         if (!school) {
           return new MirageResponse(
@@ -94,7 +90,6 @@ export function startMirageServer() {
 
       // DELETE /api/schools/:id
       this.del('/schools/:id', (schema, request) => {
-        console.log('[Mirage] DELETE /api/schools/:id', request.params.id)
         const school = schema.db.schools.findBy({ id: request.params.id })
         if (!school) {
           return new MirageResponse(
@@ -114,16 +109,11 @@ export function startMirageServer() {
 
       // GET /api/schools/:schoolId/turmas
       this.get('/schools/:schoolId/turmas', (schema, request) => {
-        console.log(
-          '[Mirage] GET /api/schools/:schoolId/turmas',
-          request.params.schoolId,
-        )
         return schema.db.turmas.where({ schoolId: request.params.schoolId })
       })
 
       // POST /api/turmas
       this.post('/turmas', (schema, request) => {
-        console.log('[Mirage] POST /api/turmas')
         const body = JSON.parse(request.requestBody)
         const newTurma = {
           id: generateId(),
@@ -142,7 +132,6 @@ export function startMirageServer() {
 
       // GET /api/turmas/:id
       this.get('/turmas/:id', (schema, request) => {
-        console.log('[Mirage] GET /api/turmas/:id', request.params.id)
         const turma = schema.db.turmas.findBy({ id: request.params.id })
         if (!turma) {
           return new MirageResponse(
@@ -156,7 +145,6 @@ export function startMirageServer() {
 
       // PUT /api/turmas/:id
       this.put('/turmas/:id', (schema, request) => {
-        console.log('[Mirage] PUT /api/turmas/:id', request.params.id)
         const turma = schema.db.turmas.findBy({ id: request.params.id })
         if (!turma) {
           return new MirageResponse(
@@ -172,7 +160,6 @@ export function startMirageServer() {
 
       // DELETE /api/turmas/:id
       this.del('/turmas/:id', (schema, request) => {
-        console.log('[Mirage] DELETE /api/turmas/:id', request.params.id)
         const turma = schema.db.turmas.findBy({ id: request.params.id })
         if (!turma) {
           return new MirageResponse(
@@ -190,6 +177,5 @@ export function startMirageServer() {
     },
   })
 
-  console.log('[Mirage] server started')
   return server
 }

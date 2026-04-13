@@ -72,14 +72,11 @@ export function installFetchXhrShim(): void {
       xhr.send(body)
     })
   }
-
-  console.log('[FetchXhrShim] installed — fetch now routes through XHR')
 }
 
 export function uninstallFetchXhrShim(): void {
   if (_originalFetch) {
     globalThis.fetch = _originalFetch
     _originalFetch = null
-    console.log('[FetchXhrShim] uninstalled')
   }
 }

@@ -17,12 +17,13 @@ interface SchoolStore {
   createSchool: (data: CreateSchoolDTO) => Promise<void>
   updateSchool: (id: string, data: UpdateSchoolDTO) => Promise<void>
   deleteSchool: (id: string) => Promise<void>
+  decrementClassCount: (schoolId: string, by: number) => void
   clearError: () => void
 }
 
 export const useSchoolsStore = create<SchoolStore>()(
   persist(
-    (set, get) => {
+    (set, _get) => {
       const repository = RepositoryFactory.createSchoolRepository()
 
       return {
@@ -81,6 +82,16 @@ export const useSchoolsStore = create<SchoolStore>()(
           } catch (error) {
             set({ error: (error as Error).message, isLoading: false })
           }
+        },
+
+        decrementClassCount: (schoolId: string, by: number) => {
+          set((state) => ({
+            schools: state.schools.map((s) =>
+              s.id === schoolId
+                ? { ...s, classCount: Math.max(0, s.classCount - by) }
+                : s,
+            ),
+          }))
         },
 
         clearError: () => set({ error: null }),
