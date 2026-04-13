@@ -5,13 +5,13 @@ import { Turma } from '../../domain/entities/Turma'
 function generateSchools(): School[] {
   return [
     {
-      id: crypto.randomUUID(),
+      id: faker.string.uuid(),
       name: faker.string.sample(),
       address: faker.location.streetAddress(),
       classCount: 0,
     },
     {
-      id: crypto.randomUUID(),
+      id: faker.string.uuid(),
       name: faker.string.sample(),
       address: faker.location.streetAddress(),
       classCount: 0,
@@ -28,7 +28,7 @@ function generateTurmas(schoolsData: School[]): Turma[] {
     for (let s = 0; s < 2; s++) {
       for (let sec = 0; sec < 2; sec++) {
         turmasList.push({
-          id: crypto.randomUUID(),
+          id: faker.string.uuid(),
           name: `${faker.string.fromCharacters(['1', '2', '3'])}º Ano ${faker.string.fromCharacters(['A', 'B', 'C'])}`,
           shift: 'morning',
           academicYear: 2026,
@@ -39,7 +39,7 @@ function generateTurmas(schoolsData: School[]): Turma[] {
   }
 
   turmasList.push({
-    id: crypto.randomUUID(),
+    id: faker.string.uuid(),
     name: '3º Ano A',
     shift: 'morning',
     academicYear: 2025,

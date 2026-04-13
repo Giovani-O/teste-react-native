@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { KeyboardAvoidingView, Platform } from 'react-native'
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -17,12 +18,17 @@ export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <ActionsheetBackdrop onPress={onClose} />
-      <ActionsheetContent>
-        <ActionsheetDragIndicatorWrapper>
-          <ActionsheetDragIndicator />
-        </ActionsheetDragIndicatorWrapper>
-        {children}
-      </ActionsheetContent>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ width: '100%' }}
+      >
+        <ActionsheetContent>
+          <ActionsheetDragIndicatorWrapper>
+            <ActionsheetDragIndicator />
+          </ActionsheetDragIndicatorWrapper>
+          {children}
+        </ActionsheetContent>
+      </KeyboardAvoidingView>
     </Actionsheet>
   )
 }

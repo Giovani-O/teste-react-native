@@ -31,24 +31,36 @@ export const useSchoolsStore = create<SchoolStore>()(
         error: null,
 
         fetchSchools: async () => {
+          console.log('[Store] fetchSchools called')
           set({ isLoading: true, error: null })
           try {
+            console.log('[Store] calling repository.findAll()...')
             const schools = await repository.findAll()
+            console.log(
+              '[Store] repository.findAll() returned',
+              schools.length,
+              'schools',
+            )
             set({ schools, isLoading: false })
           } catch (error) {
+            console.log('[Store] fetchSchools error:', (error as Error).message)
             set({ error: (error as Error).message, isLoading: false })
           }
         },
 
         createSchool: async (data: CreateSchoolDTO) => {
+          console.log('[Store] createSchool called with', data)
           set({ isLoading: true, error: null })
           try {
+            console.log('[Store] calling repository.create()...')
             const newSchool = await repository.create(data)
+            console.log('[Store] repository.create() returned', newSchool)
             set((state) => ({
               schools: [...state.schools, newSchool],
               isLoading: false,
             }))
           } catch (error) {
+            console.log('[Store] createSchool error:', (error as Error).message)
             set({ error: (error as Error).message, isLoading: false })
           }
         },

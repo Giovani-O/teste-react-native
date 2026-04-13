@@ -16,26 +16,41 @@ function adaptSchoolResponse(school: School): School {
 
 export const handlers = [
   // Escolas
-  http.get('/api/schools', async () => {
-    await delay(200)
-    const schoolsWithCount = dataStore.schools.map(adaptSchoolResponse)
-    return HttpResponse.json(schoolsWithCount)
-  }),
-
-  http.post('/api/schools', async ({ request }) => {
-    await delay(200)
-    const body = (await request.json()) as { name: string; address: string }
-    const newSchool: School = {
-      id: generateId(),
-      name: body.name,
-      address: body.address,
-      classCount: 0,
+  http.get('*/api/schools', async () => {
+    console.log('[Handler] GET /api/schools hit')
+    try {
+      await delay(200)
+      console.log('[Handler] delay done, reading dataStore...')
+      const schoolsWithCount = dataStore.schools.map(adaptSchoolResponse)
+      console.log('[Handler] returning', schoolsWithCount.length, 'schools')
+      return HttpResponse.json(schoolsWithCount)
+    } catch (e) {
+      console.log('[Handler] GET /api/schools threw:', e)
+      throw e
     }
-    dataStore.schools.push(newSchool)
-    return HttpResponse.json(adaptSchoolResponse(newSchool), { status: 201 })
   }),
 
-  http.get('/api/schools/:id', async ({ params }) => {
+  http.post('*/api/schools', async ({ request }) => {
+    console.log('[Handler] POST /api/schools hit')
+    try {
+      await delay(200)
+      const body = (await request.json()) as { name: string; address: string }
+      console.log('[Handler] POST body:', body)
+      const newSchool: School = {
+        id: generateId(),
+        name: body.name,
+        address: body.address,
+        classCount: 0,
+      }
+      dataStore.schools.push(newSchool)
+      return HttpResponse.json(adaptSchoolResponse(newSchool), { status: 201 })
+    } catch (e) {
+      console.log('[Handler] POST /api/schools threw:', e)
+      throw e
+    }
+  }),
+
+  http.get('*/api/schools/:id', async ({ params }) => {
     await delay(200)
     const school = dataStore.schools.find((s) => s.id === params.id)
     if (!school) {
@@ -44,7 +59,7 @@ export const handlers = [
     return HttpResponse.json(adaptSchoolResponse(school))
   }),
 
-  http.put('/api/schools/:id', async ({ params, request }) => {
+  http.put('*/api/schools/:id', async ({ params, request }) => {
     await delay(200)
     const body = (await request.json()) as { name?: string; address?: string }
     const index = dataStore.schools.findIndex((s) => s.id === params.id)
@@ -59,7 +74,7 @@ export const handlers = [
     return HttpResponse.json(adaptSchoolResponse(updated))
   }),
 
-  http.delete('/api/schools/:id', async ({ params }) => {
+  http.delete('*/api/schools/:id', async ({ params }) => {
     await delay(200)
     const index = dataStore.schools.findIndex((s) => s.id === params.id)
     if (index === -1) {
@@ -71,7 +86,7 @@ export const handlers = [
   }),
 
   // Turmas
-  http.get('/api/schools/:schoolId/turmas', async ({ params }) => {
+  http.get('*/api/schools/:schoolId/turmas', async ({ params }) => {
     await delay(200)
     const turmas = dataStore.turmas.filter(
       (t) => t.schoolId === params.schoolId,
@@ -79,7 +94,7 @@ export const handlers = [
     return HttpResponse.json(turmas)
   }),
 
-  http.post('/api/turmas', async ({ request }) => {
+  http.post('*/api/turmas', async ({ request }) => {
     await delay(200)
     const body = (await request.json()) as {
       name: string
@@ -98,7 +113,7 @@ export const handlers = [
     return HttpResponse.json(newTurma, { status: 201 })
   }),
 
-  http.get('/api/turmas/:id', async ({ params }) => {
+  http.get('*/api/turmas/:id', async ({ params }) => {
     await delay(200)
     const turma = dataStore.turmas.find((t) => t.id === params.id)
     if (!turma) {
@@ -107,7 +122,7 @@ export const handlers = [
     return HttpResponse.json(turma)
   }),
 
-  http.put('/api/turmas/:id', async ({ params, request }) => {
+  http.put('*/api/turmas/:id', async ({ params, request }) => {
     await delay(200)
     const body = (await request.json()) as {
       name?: string
@@ -126,7 +141,7 @@ export const handlers = [
     return HttpResponse.json(updated)
   }),
 
-  http.delete('/api/turmas/:id', async ({ params }) => {
+  http.delete('*/api/turmas/:id', async ({ params }) => {
     await delay(200)
     const index = dataStore.turmas.findIndex((t) => t.id === params.id)
     if (index === -1) {

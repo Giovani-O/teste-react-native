@@ -6,7 +6,7 @@ import {
 import { ITurmaRepository } from '../../domain/repositories/ITurmaRepository'
 import { adaptTurma, adaptTurmaList } from '../adapters/turma.adapter'
 
-const BASE_URL = '/api'
+const BASE_URL = 'http://localhost/api'
 
 export class TurmaRepository implements ITurmaRepository {
   async findBySchoolId(schoolId: string): Promise<Turma[]> {
