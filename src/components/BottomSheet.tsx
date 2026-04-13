@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { useEffect, useRef, ReactNode } from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import {
   Actionsheet,
@@ -11,10 +11,24 @@ import {
 interface BottomSheetProps {
   isOpen: boolean
   onClose: () => void
+  onOpen?: () => void
   children: ReactNode
 }
 
-export function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
+export function BottomSheet({
+  isOpen,
+  onClose,
+  onOpen,
+  children,
+}: BottomSheetProps) {
+  const prevOpen = useRef(isOpen)
+  useEffect(() => {
+    if (isOpen && !prevOpen.current && onOpen) {
+      onOpen()
+    }
+    prevOpen.current = isOpen
+  }, [isOpen, onOpen])
+
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <ActionsheetBackdrop onPress={onClose} />
