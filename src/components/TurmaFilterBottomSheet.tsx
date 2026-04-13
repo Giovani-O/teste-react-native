@@ -2,8 +2,8 @@ import { X } from 'lucide-react-native'
 import { useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { Text } from '@/components/ui/text'
-import { BottomSheet } from './BottomSheet'
 import { Shift } from '../domain/entities/Turma'
+import { BottomSheet } from './BottomSheet'
 
 interface Filters {
   name: string
@@ -71,15 +71,6 @@ export function TurmaFilterBottomSheet({
     onFiltersChange({
       name: '',
       shift: localShift,
-      academicYear: localAcademicYear,
-    })
-  }
-
-  const clearShift = () => {
-    setLocalShift('')
-    onFiltersChange({
-      name: localName,
-      shift: '',
       academicYear: localAcademicYear,
     })
   }

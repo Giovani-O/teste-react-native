@@ -129,9 +129,14 @@ export function SchoolDetailScreen() {
     academicYear: number
   }) => {
     if (!id) return
+    const previousTurmasCount = useTurmasStore.getState().turmas.length
     await createTurma({ ...data, schoolId: id })
-    incrementClassCount(id, 1)
-    setCreateOpen(false)
+    const { error: createTurmaError, turmas: updatedTurmas } =
+      useTurmasStore.getState()
+    if (!createTurmaError && updatedTurmas.length > previousTurmasCount) {
+      incrementClassCount(id, 1)
+      setCreateOpen(false)
+    }
   }
 
   if (!school) {
@@ -155,10 +160,19 @@ export function SchoolDetailScreen() {
 
   const handleDeleteTurma = async () => {
     if (!selectedTurma?.id || !id) return
-    await deleteTurma(selectedTurma.id)
-    decrementClassCount(id, 1)
-    setDeleteTurmaOpen(false)
-    setSelectedTurma(null)
+    const turmaId = selectedTurma.id
+    const turmaExistedBeforeDelete = useTurmasStore
+      .getState()
+      .turmas.some((turma) => turma.id === turmaId)
+    await deleteTurma(turmaId)
+    const turmaStillExists = useTurmasStore
+      .getState()
+      .turmas.some((turma) => turma.id === turmaId)
+    if (turmaExistedBeforeDelete && !turmaStillExists) {
+      decrementClassCount(id, 1)
+      setDeleteTurmaOpen(false)
+      setSelectedTurma(null)
+    }
   }
 
   return (
@@ -278,6 +292,7 @@ export function SchoolDetailScreen() {
                         onPress={() => {
                           setEditingTurma(turma)
                           setEditTurmaOpen(true)
+                          setSelectedTurma(null)
                         }}
                       >
                         <PencilLine size={18} color="#374151" />
@@ -334,6 +349,7 @@ export function SchoolDetailScreen() {
         }}
         onSave={handleEditTurma}
         initialValues={editingTurma ?? undefined}
+        isLoading={isLoading}
       />
 
       <SchoolFormBottomSheet
@@ -362,7 +378,7 @@ export function SchoolDetailScreen() {
         onConfirm={handleDeleteTurma}
         title="Excluir Turma"
         message={`Tem certeza que deseja excluir "${selectedTurma?.name}"? Esta ação não pode ser desfeita.`}
-        isLoading={schoolLoading}
+        isLoading={isLoading}
       />
 
       <TurmaFilterBottomSheet

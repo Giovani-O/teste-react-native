@@ -96,9 +96,12 @@ export const useSchoolsStore = create<SchoolStore>()(
         },
 
         incrementClassCount: (schoolId: string, by: number) => {
+          if (by <= 0) return
           set((state) => ({
             schools: state.schools.map((s) =>
-              s.id === schoolId ? { ...s, classCount: s.classCount + by } : s,
+              s.id === schoolId
+                ? { ...s, classCount: Math.max(0, s.classCount + by) }
+                : s,
             ),
           }))
         },
