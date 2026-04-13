@@ -1,9 +1,4 @@
-import {
-  CreateTurmaDTO,
-  Shift,
-  Turma,
-  UpdateTurmaDTO,
-} from '../../domain/entities/Turma'
+import { Shift, Turma } from '../../domain/entities/Turma'
 
 export interface RawTurmaResponse {
   id: string
