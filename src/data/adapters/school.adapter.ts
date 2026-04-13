@@ -1,8 +1,4 @@
-import {
-  CreateSchoolDTO,
-  School,
-  UpdateSchoolDTO,
-} from '../../domain/entities/School'
+import { School } from '../../domain/entities/School'
 
 export interface RawSchoolResponse {
   id: string
