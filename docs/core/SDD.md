@@ -23,7 +23,7 @@
 | Zustand | 5.0.12 | Client state management |
 | MirageJS | 0.1.48 | Mocked API server (XHR interception) |
 | AsyncStorage | 2.2.0 | Local persistence |
-| jest-expo | 55.0.15 | Test runner |
+| jest-expo | ~54.0.17 | Test runner |
 | Biome | 2.4.11 | Linter and formatter |
 
 ### 1.1 Dependency Troubleshooting
@@ -332,7 +332,7 @@ PUT    /api/turmas/:id           Update a turma
 DELETE /api/turmas/:id           Delete a turma
 ```
 
-An in-memory data store (seeded with faker-generated data) inside `mirageServer.ts` simulates persistence within a session. Deleting a school cascades to delete its turmas in the in-memory store.
+An in-memory data store inside `mirageServer.ts` simulates persistence within a session. The store starts empty — schools and turmas are created by the user at runtime. Deleting a school cascades to delete its turmas in the in-memory store.
 
 ---
 

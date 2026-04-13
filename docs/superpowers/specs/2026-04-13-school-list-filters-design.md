@@ -19,7 +19,8 @@ Add filtering capability to the SchoolListScreen to allow users to search school
   - Nome (placeholder: "Buscar por nome...")
   - Endereço (placeholder: "Buscar por endereço...")
 - Each input has a clear button (X icon) on the right when not empty
-- Apply button and Clear All Filters button at bottom
+- "Limpar Filtros" button at bottom to clear all filters
+- Filters apply immediately on input (no explicit Apply action)
 
 ## Functionality
 

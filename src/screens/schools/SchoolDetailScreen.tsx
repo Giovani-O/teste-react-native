@@ -61,11 +61,17 @@ export function SchoolDetailScreen() {
   const handleDelete = async () => {
     if (!id) return
     setIsDeleting(true)
-    await deleteTurmaBySchoolId(id)
-    await deleteSchool(id)
-    setDeleteOpen(false)
-    setMenuOpen(false)
-    router.back()
+    try {
+      await deleteTurmaBySchoolId(id)
+      await deleteSchool(id)
+      setDeleteOpen(false)
+      setMenuOpen(false)
+      router.back()
+    } catch (error) {
+      console.error('Failed to delete school:', error)
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   if (!school) {

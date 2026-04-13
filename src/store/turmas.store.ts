@@ -81,16 +81,27 @@ export const useTurmasStore = create<TurmaStore>()(
         },
 
         deleteTurmaBySchoolId: async (schoolId: string) => {
-          const currentTurmas = get().turmas
-          const turmasToDelete = currentTurmas.filter(
-            (t: Turma) => t.schoolId === schoolId,
-          )
-          for (const turma of turmasToDelete) {
-            await repository.delete(turma.id)
+          set({ isLoading: true, error: null })
+          try {
+            const currentTurmas = get().turmas
+            const turmasToDelete = currentTurmas.filter(
+              (t: Turma) => t.schoolId === schoolId,
+            )
+            const deleteResults = await Promise.all(
+              turmasToDelete.map((turma) => repository.delete(turma.id)),
+            )
+            if (deleteResults.some((success) => !success)) {
+              throw new Error('Failed to delete all turmas for the school')
+            }
+            set((state) => ({
+              turmas: state.turmas.filter(
+                (t: Turma) => t.schoolId !== schoolId,
+              ),
+              isLoading: false,
+            }))
+          } catch (error) {
+            set({ error: (error as Error).message, isLoading: false })
           }
-          set((state) => ({
-            turmas: state.turmas.filter((t: Turma) => t.schoolId !== schoolId),
-          }))
         },
 
         clearError: () => set({ error: null }),

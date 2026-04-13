@@ -1,8 +1,7 @@
+import { X } from 'lucide-react-native'
 import { useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
-import { Button, ButtonText } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
-import { X } from 'lucide-react-native'
 import { BottomSheet } from './BottomSheet'
 
 interface Filters {

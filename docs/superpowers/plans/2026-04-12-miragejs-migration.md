@@ -19,7 +19,7 @@
 | Create | `src/data/mocks/mirageServer.ts` | Defines the Mirage server: routes, seeds, in-memory data |
 | Delete | `src/data/mocks/mockFetch.ts` | No longer needed (replaced by mirageServer + shim) |
 | Modify | `app/_layout.tsx` | Import `startMirageServer` instead of `installMockFetch` |
-| Keep | `src/data/mocks/dataStore.ts` | Faker-generated data reused as seed |
+| Keep | `src/data/mocks/dataStore.ts` | In-memory data store (starts empty) |
 | Keep | `src/data/mocks/handlers.ts` | MSW handlers — kept in repo but not imported anywhere |
 | Keep | `src/data/mocks/server.ts` | MSW server — kept in repo but not imported anywhere |
 | Keep | `src/data/repositories/SchoolRepository.ts` | Unchanged — still fetches `http://localhost/api/schools` |
@@ -174,7 +174,7 @@ git commit -m "feat(mock): add fetch-to-XHR shim for MirageJS compatibility"
 
 Mirage uses a `createServer` function. We configure:
 - **models** (in-memory schema): `school` and `turma`
-- **seeds**: populate from the existing `dataStore` faker-generated data
+- **seeds**: none (store starts empty, data is created at runtime)
 - **routes**: replicate all endpoints from the old `handlers.ts`
 
 - [ ] **Step 1: Create the file**
@@ -195,15 +195,9 @@ export function startMirageServer() {
       turma: Model,
     },
 
-    seeds(server) {
-      // Seed from the faker-generated dataStore so data is consistent
-      for (const school of dataStore.schools) {
-        server.db.schools.insert({ ...school })
-      }
-      for (const turma of dataStore.turmas) {
-        server.db.turmas.insert({ ...turma })
-      }
-    },
+  seeds(server) {
+    // No seed data — store starts empty, data is created by user actions
+  },
 
     routes() {
       this.namespace = 'api'
@@ -439,7 +433,7 @@ In order, you should see:
 
 - [ ] **Step 3: Verify school list renders**
 
-The school list screen should display 2 faker-generated schools (not empty, not a spinner that never resolves).
+The school list screen should display an empty state (no schools initially). Users can add schools via the FAB.
 
 - [ ] **Step 4: Verify create school works**
 

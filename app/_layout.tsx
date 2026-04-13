@@ -19,7 +19,12 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!__DEV__) return
-    enableMocking().then(() => setMockingReady(true))
+    enableMocking()
+      .then(() => setMockingReady(true))
+      .catch((error) => {
+        console.error('Failed to initialize mocking:', error)
+        setMockingReady(true)
+      })
   }, [])
 
   if (!mockingReady) return null

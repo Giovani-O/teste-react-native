@@ -1,3 +1,5 @@
+import Constants from 'expo-constants'
+
 import {
   CreateSchoolDTO,
   School,
@@ -6,7 +8,7 @@ import {
 import { ISchoolRepository } from '../../domain/repositories/ISchoolRepository'
 import { adaptSchool, adaptSchoolList } from '../adapters/school.adapter'
 
-const BASE_URL = 'http://localhost/api'
+const BASE_URL = `${Constants.expoConfig?.extra?.baseUrl}/api`
 
 export class SchoolRepository implements ISchoolRepository {
   async findAll(): Promise<School[]> {

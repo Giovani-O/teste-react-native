@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TextInput, View } from 'react-native'
 import { Button, ButtonText } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
@@ -25,8 +25,15 @@ export function SchoolFormBottomSheet({
   initialValues,
   isLoading,
 }: SchoolFormBottomSheetProps) {
-  const [name, setName] = useState(initialValues?.name ?? '')
-  const [address, setAddress] = useState(initialValues?.address ?? '')
+  const [name, setName] = useState('')
+  const [address, setAddress] = useState('')
+
+  useEffect(() => {
+    if (isOpen) {
+      setName(initialValues?.name ?? '')
+      setAddress(initialValues?.address ?? '')
+    }
+  }, [isOpen, initialValues?.name, initialValues?.address])
 
   const isEditing = !!initialValues
   const canSave = name.trim() && address.trim()
@@ -34,8 +41,10 @@ export function SchoolFormBottomSheet({
   const handleSave = async () => {
     if (!canSave) return
     await onSave({ name: name.trim(), address: address.trim() })
-    setName('')
-    setAddress('')
+    if (!isEditing) {
+      setName('')
+      setAddress('')
+    }
     onClose()
   }
 

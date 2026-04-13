@@ -48,14 +48,14 @@ export function ConfirmDialog({
             variant="outline"
             className="flex-1 border-gray-300"
             onPress={onClose}
-            disabled={isLoading}
+            isDisabled={isLoading}
           >
             <ButtonText className="text-gray-700">Cancelar</ButtonText>
           </Button>
           <Button
             className="flex-1 bg-red-500"
             onPress={onConfirm}
-            disabled={isLoading}
+            isDisabled={isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color="white" size="small" />

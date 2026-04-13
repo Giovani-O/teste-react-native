@@ -1,6 +1,5 @@
 // src/data/mocks/mirageServer.ts
 import { createServer, Response as MirageResponse, Model } from 'miragejs'
-import { dataStore } from './dataStore'
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
@@ -11,16 +10,6 @@ export function startMirageServer() {
     models: {
       school: Model,
       turma: Model,
-    },
-
-    seeds(server) {
-      // Seed from the faker-generated dataStore so data is consistent
-      for (const school of dataStore.schools) {
-        server.db.schools.insert({ ...school })
-      }
-      for (const turma of dataStore.turmas) {
-        server.db.turmas.insert({ ...turma })
-      }
     },
 
     routes() {
