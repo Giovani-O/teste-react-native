@@ -21,7 +21,7 @@
 | NativeWind | 4.2.3 | Tailwind CSS styling for React Native |
 | Tailwind CSS | 3.4.19 | Utility-first CSS framework (via NativeWind) |
 | Zustand | 5.0.12 | Client state management |
-| MSW | 2.13.2 | Mocked API server (native mode) |
+| MirageJS | 0.1.48 | Mocked API server (XHR interception) |
 | AsyncStorage | 2.2.0 | Local persistence |
 | jest-expo | 55.0.15 | Test runner |
 | Biome | 2.4.11 | Linter and formatter |
@@ -80,7 +80,7 @@ The application follows **Clean Architecture** with three layers. Each layer has
 │   (Entities + Interfaces)   │
 └─────────────────────────────┘
              ↑
-   MSW intercepts fetch() calls
+   MirageJS intercepts XHR calls
    at the network level (dev only)
 ```
 
@@ -97,7 +97,7 @@ The application follows **Clean Architecture** with three layers. Each layer has
 ```
 /
 ├── app/                          # Expo Router routes (thin wrappers only)
-│   ├── _layout.tsx               # Root layout — MSW init, tab navigator
+│   ├── _layout.tsx               # Root layout — Mirage init, tab navigator
 │   └── (tabs)/
 │       ├── _layout.tsx           # Tab bar definition (single tab: schools)
 │       └── schools/
@@ -112,7 +112,7 @@ The application follows **Clean Architecture** with three layers. Each layer has
     ├── data/                     # Implements domain contracts
     │   ├── adapters/             # Raw API response → domain entity
     │   ├── repositories/         # Concrete fetch-based implementations
-    │   └── mocks/                # MSW handlers + in-memory data store
+    │   └── mocks/                # MirageJS server + fetch→XHR shim + in-memory data store
     │
     ├── store/                    # Zustand stores with AsyncStorage middleware
     │   ├── schools.store.ts
@@ -184,7 +184,7 @@ export interface UpdateTurmaDTO {
 
 ### 5.1 Adapter Pattern
 
-Adapters live in `src/data/adapters/`. Each adapter transforms a raw MSW API response into a typed domain entity. This is the only place that knows the API response shape — if the mock API changes, only the adapter changes.
+Adapters live in `src/data/adapters/`. Each adapter transforms a raw API response into a typed domain entity. This is the only place that knows the API response shape — if the mock API changes, only the adapter changes.
 
 ```ts
 // src/data/adapters/school.adapter.ts
@@ -250,7 +250,7 @@ interface TurmaStore {
 
 ### 6.2 Derived Data
 
-`classCount` on each `School` is computed by the MSW handler when returning school data — it counts the turmas with a matching `schoolId` in the in-memory store. The field is never stored on the school record itself.
+`classCount` on each `School` is computed by the MirageJS route handler when returning school data — it counts the turmas with a matching `schoolId` in the in-memory store. The field is never stored on the school record itself.
 
 ### 6.3 AsyncStorage Persistence
 
@@ -260,7 +260,7 @@ A `withAsyncStorage` middleware wraps each store. On every state write, it seria
 Keys: @schools/list, @turmas/list
 ```
 
-MSW is still called for all mutations. AsyncStorage mirrors store state — it is not the source of truth.
+MirageJS is still called for all mutations. AsyncStorage mirrors store state — it is not the source of truth.
 
 ---
 
@@ -302,15 +302,17 @@ Each list screen has a floating action button (+) anchored to the bottom-right c
 
 ---
 
-## 9. Mocked Backend (MSW)
+## 9. Mocked Backend (MirageJS)
 
-MSW runs in native mode via `msw/native` using `@mswjs/interceptors`. It intercepts `fetch` at the network level — no special casing needed in production code paths.
+MirageJS intercepts XHR at the network level via Pretender. Because React Native's New Architecture uses a JSI-based `fetch` that bypasses XHR entirely, a thin fetch→XHR shim (`fetchXhrShim.ts`) is installed after Mirage starts, routing all `fetch` calls through `XMLHttpRequest` so Mirage can intercept them.
 
 **Initialization** (in `app/_layout.tsx`, dev only):
 ```ts
 if (__DEV__) {
-  const { server } = require('../src/data/mocks/server')
-  server.listen()
+  const { startMirageServer } = await import('../src/data/mocks/mirageServer')
+  startMirageServer()
+  const { installFetchXhrShim } = await import('../src/data/mocks/fetchXhrShim')
+  installFetchXhrShim()
 }
 ```
 
@@ -330,7 +332,7 @@ PUT    /api/turmas/:id           Update a turma
 DELETE /api/turmas/:id           Delete a turma
 ```
 
-An in-memory data store inside the MSW handlers simulates persistence within a session. Deleting a school cascades to delete its turmas in the in-memory store.
+An in-memory data store (seeded with faker-generated data) inside `mirageServer.ts` simulates persistence within a session. Deleting a school cascades to delete its turmas in the in-memory store.
 
 ---
 
@@ -355,7 +357,7 @@ Tests are scoped to **screens and components only** (v1 scope).
 |---|---|
 | jest-expo | Test runner, preset handles RN/Expo transforms |
 | React Native Testing Library | Render and interact with components |
-| MSW | Same handlers reused as test fixtures |
+| MirageJS | Same server reused as test fixtures |
 | AsyncStorage mock | `@react-native-async-storage/async-storage/jest/async-storage-mock` |
 
 Tests live co-located with the component they test in a `__tests__/` subfolder.

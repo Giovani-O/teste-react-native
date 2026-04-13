@@ -1,12 +1,13 @@
 import { Text } from '@/components/ui/text'
 import { useLocalSearchParams } from 'expo-router'
-import { useEffect, useState } from 'react'
-import { ScrollView, View } from 'react-native'
+import { useEffect } from 'react'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { BottomSheet } from '../../components/BottomSheet'
 import { FAB } from '../../components/FAB'
-import { mockSchools, mockTurmas } from '../../data/mocks/mockData'
-import { School } from '../../domain/entities/School'
-import { Shift, Turma } from '../../domain/entities/Turma'
+import { useSchoolsStore } from '../../store/schools.store'
+import { useTurmasStore } from '../../store/turmas.store'
+import { Shift } from '../../domain/entities/Turma'
+import { useState } from 'react'
 
 const shiftLabels: Record<Shift, string> = {
   morning: 'Manhã',
@@ -22,15 +23,19 @@ const shiftClassNames: Record<Shift, string> = {
 
 export function SchoolDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
-  const [school, setSchool] = useState<School | null>(null)
-  const [turmas, setTurmas] = useState<Turma[]>([])
   const [createOpen, setCreateOpen] = useState(false)
 
+  const school = useSchoolsStore((state) =>
+    state.schools.find((s) => s.id === id),
+  )
+
+  const { turmas, isLoading, fetchTurmasBySchool } = useTurmasStore()
+
   useEffect(() => {
-    const found = mockSchools.find((s) => s.id === id)
-    setSchool(found ?? null)
-    setTurmas(mockTurmas[id as string] ?? [])
-  }, [id])
+    if (id) {
+      fetchTurmasBySchool(id)
+    }
+  }, [id, fetchTurmasBySchool])
 
   if (!school) {
     return (
@@ -57,7 +62,11 @@ export function SchoolDetailScreen() {
         Turmas
       </Text>
 
-      {turmas.length === 0 ? (
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator />
+        </View>
+      ) : turmas.length === 0 ? (
         <View className="flex-1 justify-center items-center p-8">
           <Text className="text-base text-gray-500 text-center mb-2">
             Nenhuma turma encontrada
